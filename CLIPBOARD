@@ -1,0 +1,40 @@
+AUTH_LDAP_SERVER_URI = "ldap://ldap.example.com"
+AUTH_LDAP_BIND_DN = "cn=admin,dc=example,dc=com"
+AUTH_LDAP_BIND_PASSWORD = "password"
+AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(username)s,ou=users,dc=example,dc=com"
+AUTH_LDAP_GROUP_SEARCH_BASE = "ou=groups,dc=example,dc=com"
+AUTH_LDAP_GROUP_FILTER = "(objectClass=posixGroup)"
+AUTH_LDAP_GROUP_ATTRIBUTE = "cn"
+
+
+from django.contrib.auth import authenticate
+from ldap3 import Server, Connection, BIND_AUTH_SIMPLE
+
+def ldap_auth(username, password):
+    server = Server(AUTH_LDAP_SERVER_URI)
+    connection = Connection(server, user=AUTH_LDAP_BIND_DN, password=AUTH_LDAP_BIND_PASSWORD)
+    try:
+        connection.bind()
+    except ldap3.LDAPException:
+        return None
+
+    user_dn = AUTH_LDAP_USER_DN_TEMPLATE % {"username": username}
+    try:
+        result = connection.search(user_dn, ldap3.SCOPE_BASE, filter_str=AUTH_LDAP_GROUP_FILTER)
+    except ldap3.LDAPException:
+        return None
+
+    if result:
+        return authenticate(username=username, password=password)
+    else:
+        return None
+
+def login(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    user = ldap_auth(username, password)
+    if user:
+        login(request, user)
+        return HttpResponseRedirect("/")
+    else:
+        return HttpResponseBadRequest("Invalid username or password")
