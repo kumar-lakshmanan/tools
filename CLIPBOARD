@@ -1,3 +1,27 @@
+from django.shortcuts import render
+from django.views.generic import FormView
+from .forms import LoginForm
+
+class LoginView(FormView):
+
+    form_class = LoginForm
+    template_name = 'login.html'
+
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+            return redirect('home')
+        else:
+            form.add_error('username', 'Invalid username or password.')
+            return self.render_to_response(self.get_context_data())
+
+
+
+
 AUTH_LDAP_SERVER_URI = "ldap://ldap.example.com"
 AUTH_LDAP_BIND_DN = "cn=admin,dc=example,dc=com"
 AUTH_LDAP_BIND_PASSWORD = "password"
