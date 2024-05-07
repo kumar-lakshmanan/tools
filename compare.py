@@ -38,3 +38,17 @@ print('Added: {}'.format(dif2[0]))
 print('Removed: {}'.format(dif2[1]))
 print('Modified: {}'.format(dif2[2]))
 
+
+##----
+##dictionary_item_added = [root['A9']]
+##dictionary_item_removed = [root['A6']]
+##values_changed = {"root['A3']": {'new_value': 'americax', 'old_value': 'america'}}
+##iterable_item_added = {"root['A5']['2'][2]": 'A8'}
+##iterable_item_removed = {"root['A5']['1'][1]": 'A2'}
+##----
+##Added: {'A6'}
+##Removed: {'A9'}
+##Modified: {'A3': ('america', 'americax'), 'A5': ({'1': ['A1', 'A2', 'A4', 'A6'], '2': ['A3', 'A7'], '3': ['A5']}, {'1': ['A1', 'A4', 'A6'], '2': ['A3', 'A7', 'A8'], '3': ['A5']})}
+
+
+
